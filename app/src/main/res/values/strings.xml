@@ -1,0 +1,17 @@
+<resources>
+    <string name="app_name">WMApp</string>
+    <string name="str_set">设置</string>
+    <string name="str_exit">退出</string>
+    <string name="str_start">开始</string>
+    <string name="str_startGPS">GPS获取</string>
+    <string name="str_startNET">NET获取</string>
+    <string name="str_startBDSDK">BD获取</string>
+    <string name="str_GetGSMCell">获取基站信息</string>
+    <string name="hello_world">Hello world!</string>
+    <string name="app_exit">退出</string>
+    <string name="file_open">打开文件</string>
+    <string name="file_history">历史记录</string>
+    <string name="file_clear_history">清空记录</string>
+    <string name="file_openzip">打开压缩文件</string>
+    <string name="file_opendir">打开目录</string>
+</resources>

@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
+    <item
+        android:id="@+id/imgview_file_open"
+        android:title="@string/file_openzip"
+        app:showAsAction="never" />
+    <item
+        android:id="@+id/imgview_dir_open"
+        android:title="@string/file_opendir"
+        app:showAsAction="never" />
+</menu>
