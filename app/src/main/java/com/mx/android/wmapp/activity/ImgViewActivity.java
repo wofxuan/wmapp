@@ -17,6 +17,7 @@ import android.widget.EditText;
 import android.widget.Toast;
 
 import com.android.mx.wmapp.R;
+import com.mx.android.wmapp.WMAppApplication;
 import com.mx.android.wmapp.base.BaseActivity;
 import com.mx.android.wmapp.customview.ZoomImageView;
 
@@ -117,7 +118,9 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
                 Toast.makeText(context, data.getStringExtra("selectPath"), Toast.LENGTH_SHORT).show();
                 currPath = data.getStringExtra("selectPath");
                 try {
+                    WMAppApplication wmApp = (WMAppApplication) getApplication();
                     readZipFile(currPath);
+                    wmApp.setOpenDirHis(currPath);
                     viewType = 0;
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
@@ -127,7 +130,9 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
         } else if (requestCode == OPEN_DIR_REQUEST_CODE) {
             if (resultCode == OPEN_DIR_REQUEST_CODE) {
                 currPath = data.getStringExtra("selectPath");
+                WMAppApplication wmApp = (WMAppApplication) getApplication();
                 allFileList = getFiles(currPath);
+                wmApp.setOpenDirHis(currPath);
                 if (allFileList.size() > 0) {
                     currPos = 0;
                     Bitmap bitmap = BitmapFactory.decodeFile(allFileList.get(currPos));
@@ -138,24 +143,57 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
         }
     }
 
+    protected void SetBitmapFormZipEntry(Integer readPos) {
+        try {
+            ZipEntry ze = allImgList.get(readPos);
+            Bitmap bitmap = BitmapFactory.decodeStream(aZipFile.getInputStream(ze));
+            Bitmap oldbitmap = zoomImg.getmBitmap();
+            zoomImg.setImage(bitmap);
+            oldbitmap.recycle();
+            currPos = readPos;
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+    }
+
+    protected ZipEntry GetNextZE() {
+        ZipEntry ze = null;
+        try {
+            while ((ze = aZipInputStream.getNextEntry()) != null) {
+                if (!ze.isDirectory()) {
+                    long size = ze.getSize();
+                    if (size > 0) {
+                        break;
+                    }
+                }
+            }
+            if (ze == null) {
+                aZipInputStream.closeEntry();
+            }
+        } catch (Exception e) {
+            // TODO Auto-generated catch block
+            e.printStackTrace();
+        }
+        return ze;
+    }
+
+    protected void SetBitmapFormFileName(String readName) {
+        Bitmap bitmap = BitmapFactory.decodeFile(readName);
+        Bitmap oldbitmap = zoomImg.getmBitmap();
+        zoomImg.setImage(bitmap);
+        oldbitmap.recycle();
+    }
+
     protected void readZipFile(String file) throws Exception {
         aZipFile = new ZipFile(file);
         InputStream in = new BufferedInputStream(new FileInputStream(file));
         aZipInputStream = new ZipInputStream(in);
-        ZipEntry ze;
-        while ((ze = aZipInputStream.getNextEntry()) != null) {
-            if (!ze.isDirectory()) {
-                long size = ze.getSize();
-                if (size > 0) {
-                    Bitmap bitmap = BitmapFactory.decodeStream(aZipFile.getInputStream(ze));
-                    zoomImg.setImage(bitmap);
-                    allImgList.add(ze);
-                    currPos = allImgList.size() - 1;
-                    break;
-                }
-            }
+        ZipEntry ze = GetNextZE();
+        if (ze != null) {
+            allImgList.add(ze);
+            SetBitmapFormZipEntry(allImgList.size() - 1);
         }
-//        aZipInputStream.closeEntry();
     }
 
     private List<String> getFiles(String ipath) {
@@ -184,73 +222,30 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
             if (viewType == 0) {
                 if (currPos.intValue() > 0) {
                     currPos = currPos - 1;
-                    try {
-                        ZipEntry ze = allImgList.get(currPos);
-                        Bitmap bitmap = BitmapFactory.decodeStream(aZipFile.getInputStream(ze));
-                        Bitmap oldbitmap = zoomImg.getmBitmap();
-                        zoomImg.setImage(bitmap);
-                        oldbitmap.recycle();
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+                    SetBitmapFormZipEntry(currPos);
                 }
             } else {
                 if (currPos.intValue() > 0) {
                     currPos = currPos - 1;
-                    Bitmap bitmap = BitmapFactory.decodeFile(allFileList.get(currPos));
-                    Bitmap oldbitmap = zoomImg.getmBitmap();
-                    zoomImg.setImage(bitmap);
-                    oldbitmap.recycle();
+                    SetBitmapFormFileName(allFileList.get(currPos));
                 }
             }
         } else if (v.getId() == btnnext.getId()) {
             if (viewType == 0) {
                 if (currPos.intValue() < allImgList.size() - 1) {
                     currPos = currPos + 1;
-                    try {
-                        ZipEntry ze = allImgList.get(currPos);
-                        Bitmap bitmap = BitmapFactory.decodeStream(aZipFile.getInputStream(ze));
-                        Bitmap oldbitmap = zoomImg.getmBitmap();
-                        zoomImg.setImage(bitmap);
-                        oldbitmap.recycle();
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
-                    }
+                    SetBitmapFormZipEntry(currPos);
                 } else {
-                    try {
-                        ZipEntry ze;
-                        while ((ze = aZipInputStream.getNextEntry()) != null) {
-                            if (!ze.isDirectory()) {
-                                long size = ze.getSize();
-                                if (size > 0) {
-                                    Bitmap oldbitmap = zoomImg.getmBitmap();
-                                    Bitmap bitmap = BitmapFactory.decodeStream(aZipFile.getInputStream(ze));
-                                    zoomImg.setImage(bitmap);
-                                    allImgList.add(ze);
-                                    oldbitmap.recycle();
-                                    currPos = allImgList.size() - 1;
-                                    break;
-                                }
-                            }
-                        }
-                        if (ze == null) {
-                            aZipInputStream.closeEntry();
-                        }
-                    } catch (Exception e) {
-                        // TODO Auto-generated catch block
-                        e.printStackTrace();
+                    ZipEntry ze = GetNextZE();
+                    if (ze != null) {
+                        allImgList.add(ze);
+                        SetBitmapFormZipEntry(allImgList.size() - 1);
                     }
                 }
             } else {
                 if (currPos.intValue() < allFileList.size() - 1) {
                     currPos = currPos + 1;
-                    Bitmap bitmap = BitmapFactory.decodeFile(allFileList.get(currPos));
-
-                    Bitmap oldbitmap = zoomImg.getmBitmap();
-                    zoomImg.setImage(bitmap);
-                    oldbitmap.recycle();
+                    SetBitmapFormFileName(allFileList.get(currPos));
                 }
             }
         } else if (v.getId() == btnpageNo.getId()) {
@@ -266,43 +261,12 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
                         public void onClick(DialogInterface dialog, int which) {
                             Integer inputPageNo = Integer.valueOf(inputNo.getText().toString());
                             if (inputPageNo.intValue() < allImgList.size()) {
-                                try {
-                                    ZipEntry ze = allImgList.get(inputPageNo);
-                                    Bitmap bitmap = BitmapFactory.decodeStream(aZipFile.getInputStream(ze));
-                                    Bitmap oldbitmap = zoomImg.getmBitmap();
-                                    zoomImg.setImage(bitmap);
-                                    oldbitmap.recycle();
-                                    currPos = inputPageNo;
-                                } catch (Exception e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
+                                SetBitmapFormZipEntry(inputPageNo);
                             } else {
-                                try {
-                                    ZipEntry ze;
-                                    while ((ze = aZipInputStream.getNextEntry()) != null) {
-                                        if (!ze.isDirectory()) {
-                                            long size = ze.getSize();
-                                            if (size > 0) {
-                                                allImgList.add(ze);
-                                                if (inputPageNo.intValue() == allImgList.size() - 1) {
-                                                    Bitmap bitmap = BitmapFactory.decodeStream(aZipFile.getInputStream(ze));
-                                                    Bitmap oldbitmap = zoomImg.getmBitmap();
-                                                    zoomImg.setImage(bitmap);
-                                                    oldbitmap.recycle();
-                                                    currPos = allImgList.size() - 1;
-                                                    break;
-                                                }
-
-                                            }
-                                        }
-                                    }
-                                    if (ze == null) {
-                                        aZipInputStream.closeEntry();
-                                    }
-                                } catch (Exception e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
+                                ZipEntry ze = GetNextZE();
+                                if (ze != null) {
+                                    allImgList.add(ze);
+                                    SetBitmapFormZipEntry(allImgList.size() - 1);
                                 }
                             }
                         }
