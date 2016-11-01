@@ -68,7 +68,7 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
                         intent = new Intent(context, DFSelectActivity.class);
                         intent.putExtra("type", DFSelectActivity.TypeOpen);
                         intent.putExtra("result_code", OPEN_FILE_REQUEST_CODE);
-                        intent.putExtra("defaultDir", getSDPath());
+                        intent.putExtra("defaultDir", ((WMAppApplication)getApplication()).getOpenDirHis());
                         intent.putExtra("fileType", new String[]{"*.*"});
                         startActivityForResult(intent, OPEN_FILE_REQUEST_CODE);
                         break;
@@ -118,9 +118,8 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
                 Toast.makeText(context, data.getStringExtra("selectPath"), Toast.LENGTH_SHORT).show();
                 currPath = data.getStringExtra("selectPath");
                 try {
-                    WMAppApplication wmApp = (WMAppApplication) getApplication();
                     readZipFile(currPath);
-                    wmApp.setOpenDirHis(currPath);
+                    ((WMAppApplication)getApplication()).setOpenDirHis(currPath);
                     viewType = 0;
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
