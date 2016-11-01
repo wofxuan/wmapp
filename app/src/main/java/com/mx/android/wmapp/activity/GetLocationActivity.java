@@ -65,8 +65,9 @@ public class GetLocationActivity extends BaseActivity {
         LBSTool lbs = new LBSTool(GetLocationActivity.this, AType);
         LocationData location = lbs.getLocation(120000);
         if (location != null) {
-            sb.append("lat:" + location.lat + "\n");
-            sb.append("lon:" + location.lon + "\n");
+            sb.append("纬度:" + location.lat + "\n");
+            sb.append("经度:" + location.lon + "\n");
+            sb.append("高度:" + location.Bearing + "\n");
             sb.append("address:" + location.address);
         } else {
             sb.append("location = null");

@@ -130,14 +130,14 @@ public class DFSelectActivity extends AppCompatActivity implements View.OnClickL
         } else
             for (File f : myFile) {
                 //过滤目录
-                if (f.isDirectory()) {
+                if (f.isDirectory()&&(!f.isHidden())) {
                     String tempf = f.toString();
                     int pos = tempf.lastIndexOf("/");
                     String subTemp = tempf.substring(pos + 1, tempf.length());
                     file.add(new FileItem(DirType, subTemp));
                 }
                 //过滤知道类型的文件
-                if (f.isFile() && fileType != null) {
+                if (f.isFile() && fileType != null&&(!f.isHidden())) {
                     for (int i = 0; i < fileType.length; i++) {
                         int typeStrLen = fileType[i].length();
 
