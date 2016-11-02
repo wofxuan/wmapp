@@ -1,12 +1,14 @@
 package com.mx.android.wmapp.common;
 
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.wifi.WifiManager;
 import android.os.Bundle;
 import android.os.Looper;
+import android.support.v4.content.ContextCompat;
 import android.telephony.TelephonyManager;
 import android.util.Log;
 
@@ -14,12 +16,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.List;
 
 public class LBSTool {
@@ -42,29 +38,27 @@ public class LBSTool {
     /**
      * 由经纬度获得地址
      *
-     * @param latitude  纬度
-     * @param longitude 经度
+     * @param lat 纬度
+     * @param lng 经度
      * @return
      */
-
-
     private static JSONObject geocodeAddr(double lat, double lng) {
-        String urlString = "http://ditu.google.com/maps/geo?q=+" + lat + ","
-                + lng + "&output=json&oe=utf8&hl=zh-CN&sensor=false";
+        String urlString = "http://maps.google.com/maps/api/geocode/json?latlng=" + lat + ","
+                + lng + "&hl=zh-CN&sensor=false";
         //String urlString = "http://maps.google.com/maps/api/geocode/json?latlng="+lat+","+lng+"&language=zh_CN&sensor=false";
         StringBuilder sTotalString = new StringBuilder();
         try {
-            URL url = new URL(urlString);
-            URLConnection connection = url.openConnection();
-            HttpURLConnection httpConnection = (HttpURLConnection) connection;
-            InputStream urlStream = httpConnection.getInputStream();
-            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlStream));
-            String sCurrentLine = "";
-            while ((sCurrentLine = bufferedReader.readLine()) != null) {
-                sTotalString.append(sCurrentLine);
-            }
-            bufferedReader.close();
-            httpConnection.disconnect(); // 关闭http连接
+//            URL url = new URL(urlString);
+//            URLConnection connection = url.openConnection();
+//            HttpURLConnection httpConnection = (HttpURLConnection) connection;
+//            InputStream urlStream = httpConnection.getInputStream();
+//            BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(urlStream));
+//            String sCurrentLine = "";
+//            while ((sCurrentLine = bufferedReader.readLine()) != null) {
+//                sTotalString.append(sCurrentLine);
+//            }
+//            bufferedReader.close();
+//            httpConnection.disconnect(); // 关闭http连接
         } catch (Exception e1) {
             // TODO Auto-generated catch block
             e1.printStackTrace();
@@ -72,6 +66,10 @@ public class LBSTool {
         JSONObject jsonObject = new JSONObject();
         try {
             jsonObject = new JSONObject(sTotalString.toString());
+
+//            String aa ="{\"results\":[{\"formatted_address\":\"中国四川省成都市武侯区天华二路218号\"" +
+//                    "}],\"status\":\"OK\"}";
+//            jsonObject = new JSONObject(aa);
         } catch (JSONException e) {
             e.printStackTrace();
         }
@@ -82,9 +80,12 @@ public class LBSTool {
         String address = null;
         JSONObject jsonObject = geocodeAddr(lat, lng);
         try {
-            JSONArray placemarks = jsonObject.getJSONArray("Placemark");
+            JSONArray placemarks = jsonObject.getJSONArray("results");
+            //从JSONObject 中取出location 属性
+//            JSONObject place = jsonObject.getJSONObject("results");
+//            JSONObject aa = place.getJSONObject("0");
             JSONObject place = placemarks.getJSONObject(0);
-            address = place.getString("address");
+            address = place.getString("formatted_address");
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -120,8 +121,14 @@ public class LBSTool {
         if (mType.equals(LocationManager.GPS_PROVIDER)) {
             if (isGPSEnabled()) {
                 mGPSListener = new MyLocationListner();
-                //五个参数分别为位置服务的提供者，最短通知时间间隔，最小位置变化，listener，listener所在消息队列的looper
-                mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, mGPSListener, mLooper);
+                if (mGPSListener != null) {
+                    if (ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                            || ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                        //五个参数分别为位置服务的提供者，最短通知时间间隔，最小位置变化，listener，listener所在消息队列的looper
+                        mLocationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, 5000, 0, mGPSListener, mLooper);
+                    }
+                }
+
             } else {
                 synchronized (mLBSThread) {
                     mLBSThread.notify();//通知主线程继续
@@ -220,8 +227,6 @@ public class LBSTool {
 
     /**
      * 使用经纬度从goole服务器获取对应地址
-     *
-     * @param 经纬度
      */
     private void parseLatLon(double lat, double lon, float Bearing) throws Exception {
         Log.e(Thread.currentThread().getName(), "---parseLatLon---");
@@ -252,8 +257,13 @@ public class LBSTool {
      */
     private void unRegisterLocationListener() {
         if (mGPSListener != null) {
-            mLocationManager.removeUpdates(mGPSListener);
-            mGPSListener = null;
+            if (ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED
+                    || ContextCompat.checkSelfPermission(mContext, android.Manifest.permission.ACCESS_COARSE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+
+                // No one provider activated: prompt GPS
+                mLocationManager.removeUpdates(mGPSListener);
+                mGPSListener = null;
+            }
         }
         if (mNetworkListner != null) {
             mLocationManager.removeUpdates(mNetworkListner);
@@ -286,7 +296,12 @@ public class LBSTool {
             unRegisterLocationListener();//停止LocationManager的工作
             try {
                 synchronized (mLBSThread) {
-                    parseLatLon(location.getLatitude(), location.getLongitude(), location.getBearing());//解析地理位置
+                    if (location.hasAltitude()) {
+                        parseLatLon(location.getLatitude(), location.getLongitude(), location.getBearing());//解析地理位置
+                    } else {
+                        parseLatLon(location.getLatitude(), location.getLongitude(), -1);//解析地理位置
+                    }
+
                     mLooper.quit();//解除LBSThread的Looper，LBSThread结束
                     mLBSThread.notify();//通知主线程继续
                 }
