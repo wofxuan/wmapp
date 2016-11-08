@@ -16,6 +16,7 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
+import com.android.mx.mxlib.DFSelectActivity;
 import com.android.mx.wmapp.R;
 import com.mx.android.wmapp.WMAppApplication;
 import com.mx.android.wmapp.base.BaseActivity;
@@ -68,7 +69,7 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
                         intent = new Intent(context, DFSelectActivity.class);
                         intent.putExtra("type", DFSelectActivity.TypeOpen);
                         intent.putExtra("result_code", OPEN_FILE_REQUEST_CODE);
-                        intent.putExtra("defaultDir", ((WMAppApplication)getApplication()).getOpenDirHis());
+                        intent.putExtra("defaultDir", DFSelectActivity.getOpenDirHis());
                         intent.putExtra("fileType", new String[]{"*.*"});
                         startActivityForResult(intent, OPEN_FILE_REQUEST_CODE);
                         break;
@@ -119,7 +120,6 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
                 currPath = data.getStringExtra("selectPath");
                 try {
                     readZipFile(currPath);
-                    ((WMAppApplication)getApplication()).setOpenDirHis(currPath);
                     viewType = 0;
                 } catch (Exception e) {
                     // TODO Auto-generated catch block
@@ -131,7 +131,7 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
                 currPath = data.getStringExtra("selectPath");
                 WMAppApplication wmApp = (WMAppApplication) getApplication();
                 allFileList = getFiles(currPath);
-                wmApp.setOpenDirHis(currPath);
+                DFSelectActivity.setOpenDirHis(currPath);
                 if (allFileList.size() > 0) {
                     currPos = 0;
                     Bitmap bitmap = BitmapFactory.decodeFile(allFileList.get(currPos));

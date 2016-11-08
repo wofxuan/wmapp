@@ -26,4 +26,5 @@ dependencies {
     compile 'com.android.support:design:23.1.0'
     compile files('E:/code/Android/WMApp/libs/BaiduLBS_Android.jar')
     compile project(':vitamio')
+    compile project(':mxlib')
 }

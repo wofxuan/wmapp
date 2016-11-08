@@ -1,14 +1,16 @@
 package com.mx.android.wmapp.activity;
 
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.res.Configuration;
 import android.media.AudioManager;
 import android.os.Bundle;
-import android.os.Environment;
 import android.os.Handler;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.DisplayMetrics;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -19,12 +21,15 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.mx.mxlib.DFSelectActivity;
 import com.android.mx.wmapp.R;
 import com.mx.android.wmapp.base.BaseActivity;
 import com.mx.android.wmapp.utils.DensityUtil;
 
+import java.util.List;
+
+import io.vov.vitamio.MediaPlayer;
 import io.vov.vitamio.Vitamio;
-import io.vov.vitamio.utils.Log;
 import io.vov.vitamio.widget.MediaController;
 import io.vov.vitamio.widget.VideoView;
 
@@ -39,11 +44,9 @@ public class VideoPlayerActivity extends BaseActivity {
     private static final float VITER = 0.2f;
 
     private static final int OPEN_FILE_REQUEST_CODE = 1;
-    int screenWidth;
-    int screenHeitht;
     Context context;
-    private String path = Environment.getExternalStorageDirectory()
-            .getAbsolutePath() + "/Vitamio";
+    private int screenWidth;
+    private int screenHeitht;
     private VideoView mVideoView;
     private AudioManager mAudioManager;
     private RelativeLayout gesture_volume_layout;// 音量控制布局
@@ -71,6 +74,7 @@ public class VideoPlayerActivity extends BaseActivity {
 
         ;
     };
+    private DisplayMetrics dm;
     private GestureDetector mGestureDetector;
     private MediaController mediaController;
     private int mLayout = VideoView.VIDEO_LAYOUT_ZOOM;
@@ -100,11 +104,33 @@ public class VideoPlayerActivity extends BaseActivity {
                         Intent intent = new Intent(context, DFSelectActivity.class);
                         intent.putExtra("type", DFSelectActivity.TypeOpen);
                         intent.putExtra("result_code", OPEN_FILE_REQUEST_CODE);
-                        intent.putExtra("defaultDir", context.getFilesDir().toString());
+                        intent.putExtra("defaultDir", DFSelectActivity.getOpenDirHis());
                         intent.putExtra("fileType", new String[]{"*.*"});
                         startActivityForResult(intent, OPEN_FILE_REQUEST_CODE);
                         break;
                     case R.id.file_history:
+                        List<String> items = DFSelectActivity.getHisFileLidt();
+                        if (items.size() > 0) {
+                            AlertDialog.Builder builder = new AlertDialog.Builder(context);
+                            builder.setIcon(R.drawable.ic_launcher);
+                            builder.setTitle("选择文件");
+                            //    指定下拉列表的显示数据
+                            final String[] fileList = items.toArray(new String[items.size()]);
+                            //    设置一个下拉的列表选择项
+                            builder.setItems(fileList, new DialogInterface.OnClickListener() {
+                                @Override
+                                public void onClick(DialogInterface dialog, int which) {
+                                    Toast.makeText(context, "选择的文件为：" + fileList[which], Toast.LENGTH_SHORT).show();
+                                    String currPath = fileList[which];
+                                    mVideoView.setVisibility(View.VISIBLE);
+                                    mVideoView.setVideoPath(currPath);
+                                }
+                            });
+                            builder.show();
+                        } else {
+                            Toast.makeText(context, "没有历史记录", Toast.LENGTH_SHORT).show();
+                        }
+
                         break;
                     case R.id.file_clear_history:
                         break;
@@ -127,17 +153,21 @@ public class VideoPlayerActivity extends BaseActivity {
 
         mVideoView.setVisibility(View.GONE);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
-//        mVideoView.setVideoPath(path);
         mediaController = new MediaController(this);
         mVideoView.setMediaController(mediaController);
+
+        mVideoView.setVideoQuality(MediaPlayer.VIDEOQUALITY_MEDIUM);
+        mVideoView.setVideoChroma(MediaPlayer.VIDEOCHROMA_RGB565);;
 //        mVideoView.requestFocus();
-        DisplayMetrics dm = new DisplayMetrics();
+        dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
         screenWidth = dm.widthPixels;
         screenHeitht = dm.heightPixels;
         maxVolume = mAudioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
         currentVolume = mAudioManager.getStreamVolume(AudioManager.STREAM_MUSIC);
         mGestureDetector = new GestureDetector(this, new MyGestectoroListener());
+
+        mVideoView.setVideoPath("");
     }
 
     @Override
@@ -152,9 +182,10 @@ public class VideoPlayerActivity extends BaseActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == OPEN_FILE_REQUEST_CODE) {
             if (resultCode == 1) {
-//                Toast.makeText(context, data.getStringExtra("selectPath"), Toast.LENGTH_SHORT).show();
+//                Toast.makeText(context, data.getStringExtra("selectPath"), Toast.LENGTH_SHORT).show()
+                String currPath = data.getStringExtra("selectPath");
                 mVideoView.setVisibility(View.VISIBLE);
-                mVideoView.setVideoPath(data.getStringExtra("selectPath"));
+                mVideoView.setVideoPath(currPath);
             }
         }
     }
@@ -204,6 +235,9 @@ public class VideoPlayerActivity extends BaseActivity {
     @Override
     public void onConfigurationChanged(Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
+        getWindowManager().getDefaultDisplay().getMetrics(dm);
+        screenWidth = dm.widthPixels;
+        screenHeitht = dm.heightPixels;
     }
 
     /**
@@ -219,7 +253,7 @@ public class VideoPlayerActivity extends BaseActivity {
     @Override
     protected void onResume() {
         // TODO Auto-generated method stub
-        playerDuration = mVideoView.getDuration();
+        //playerDuration = mVideoView.getDuration();
         Log.i("tag", "onresume中总长度" + playerDuration);
         super.onResume();
     }
