@@ -14,6 +14,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.android.mx.mxlib.DFSelectActivity;
@@ -49,6 +50,7 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
     private Button btnpageNo;
     private ZipFile aZipFile;
     private ZipInputStream aZipInputStream;
+    private TextView tooolBarCaption;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,6 +58,7 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
         setContentView(R.layout.activity_img_view);
         context = this;
 
+        tooolBarCaption = (TextView) findViewById(R.id.toolBarCaption);
         Toolbar toolbar = (Toolbar) findViewById(R.id.imgtoolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
@@ -111,6 +114,18 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
         return true;
     }
 
+    //获取路径里面的文件名
+    public String getFileName(String pathandname) {
+        int start = pathandname.lastIndexOf("/");
+        int end = pathandname.length();
+        if (start != -1 && end != -1) {
+            return pathandname.substring(start + 1, end);
+        } else {
+            return null;
+        }
+
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -120,6 +135,7 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
                 currPath = data.getStringExtra("selectPath");
                 try {
                     readZipFile(currPath);
+                    tooolBarCaption.setText(getFileName(currPath));
                     viewType = 0;
                 } catch (Exception e) {
                     // TODO Auto-generated catch block

@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WMApp</string>
+    <string name="app_name">WM</string>
     <string name="str_set">设置</string>
     <string name="str_exit">退出</string>
     <string name="str_start">开始</string>

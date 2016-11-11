@@ -11,6 +11,7 @@
         android:background="#30469b">
         <!--自定义控件-->
         <TextView
+            android:id="@+id/toolBarCaption"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="imgtoolbar" />

@@ -13,11 +13,11 @@ public class OptData {
     public static final int view_img = 5;
 
     public static final OptData[] OptDataS = {
-            new OptData(intall_Info, "001", "安装信息", R.drawable.install48px),
-            new OptData(sys_Info, "002", "系统状态", R.drawable.system48px),
-            new OptData(cur_Pos, "003", "当前位置", R.drawable.location48px),
-            new OptData(video_player, "004", "播放视频", R.drawable.videoplayer48px),
-            new OptData(view_img, "005", "查看图片", R.drawable.viewimg96px),
+            new OptData(intall_Info, "001", "安装信息", R.mipmap.install),
+            new OptData(sys_Info, "002", "系统状态", R.mipmap.system),
+            new OptData(cur_Pos, "003", "当前位置", R.mipmap.location),
+            new OptData(video_player, "004", "播放视频", R.mipmap.videoplayer),
+            new OptData(view_img, "005", "查看图片", R.mipmap.viewimg),
     };
     public long sid;
     public String mid;
