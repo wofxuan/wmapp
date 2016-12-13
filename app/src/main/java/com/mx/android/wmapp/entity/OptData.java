@@ -11,6 +11,7 @@ public class OptData {
     public static final int cur_Pos = 3;
     public static final int video_player = 4;
     public static final int view_img = 5;
+    public static final int view_web = 6;
 
     public static final OptData[] OptDataS = {
             new OptData(intall_Info, "001", "安装信息", R.mipmap.install),
@@ -18,6 +19,7 @@ public class OptData {
             new OptData(cur_Pos, "003", "当前位置", R.mipmap.location),
             new OptData(video_player, "004", "播放视频", R.mipmap.videoplayer),
             new OptData(view_img, "005", "查看图片", R.mipmap.viewimg),
+            new OptData(view_web, "006", "网页浏览", R.mipmap.viewweb),
     };
     public long sid;
     public String mid;

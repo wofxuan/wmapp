@@ -11,7 +11,7 @@ import com.mx.android.wmapp.base.BaseActivity;
 
 public class LoadActivity extends BaseActivity {
 
-    private static final int LOAD_DISPLAY_TIME = 2000;
+    private static final int LOAD_DISPLAY_TIME = 1000;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

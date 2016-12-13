@@ -82,14 +82,16 @@ public class VideoPlayerActivity extends BaseActivity {
     private int currentLentth;
     private long palyerCurrentPosition;  // 度播放的当前标志，毫秒
     private long playerDuration;// 播放资源的时长，毫秒
+    private Toolbar toolbar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         context = this;
+        Vitamio.isInitialized(this);//初始化Vitamio库，在布局文件加载之前.tamio.initialize(this)?
         setContentView(R.layout.activity_video_player);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.videplayerotoolbar);
+        toolbar = (Toolbar) findViewById(R.id.videplayerotoolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
         toolbar.setOnMenuItemClickListener(new Toolbar.OnMenuItemClickListener() {
@@ -149,8 +151,6 @@ public class VideoPlayerActivity extends BaseActivity {
         gesture_iv_progress = (ImageView) findViewById(R.id.gesture_iv_progress);
         gesture_iv_player_volume = (ImageView) findViewById(R.id.gesture_iv_player_volume);
 
-        Vitamio.isInitialized(this);
-
         mVideoView.setVisibility(View.GONE);
         mAudioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
         mediaController = new MediaController(this);
@@ -186,6 +186,7 @@ public class VideoPlayerActivity extends BaseActivity {
                 String currPath = data.getStringExtra("selectPath");
                 mVideoView.setVisibility(View.VISIBLE);
                 mVideoView.setVideoPath(currPath);
+                toolbar.setVisibility(View.GONE);
             }
         }
     }
@@ -248,6 +249,11 @@ public class VideoPlayerActivity extends BaseActivity {
         // 隐藏
         handler.removeMessages(0);
         handler.sendEmptyMessageDelayed(0, 500);
+        if(toolbar.getVisibility() == View.GONE){
+            toolbar.setVisibility(View.VISIBLE);
+        }else {
+            toolbar.setVisibility(View.GONE);
+        }
     }
 
     @Override

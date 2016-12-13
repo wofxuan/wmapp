@@ -14,4 +14,5 @@
     <string name="file_clear_history">清空记录</string>
     <string name="file_openzip">打开压缩文件</string>
     <string name="file_opendir">打开目录</string>
+    <string name="title_activity_view_web">ViewWebActivity</string>
 </resources>
