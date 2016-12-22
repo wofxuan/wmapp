@@ -26,6 +26,10 @@ import android.widget.Toast;
 
 import com.android.mx.wmapp.R;
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
+
 public class ViewWebActivity extends Activity implements View.OnClickListener, IWebViewEvent {
 
     RelativeLayout main_layout;
@@ -205,8 +209,8 @@ public class ViewWebActivity extends Activity implements View.OnClickListener, I
                 doMenuMore(false);
                 break;
             case R.id.popup_add_bookmark:
-                FavoritesManager favoritesManager = new FavoritesManager(this);
-                favoritesManager.addFavorite(webViewManage.currUrlTitle(), webViewManage.currUrl());
+                FavAndHisManager favAndHisManager = new FavAndHisManager(this);
+                favAndHisManager.addFavorite(webViewManage.currUrlTitle(), webViewManage.currUrl());
                 Toast.makeText(this, "添加成功", Toast.LENGTH_LONG).show();
                 doMenuMore(false);
                 break;
@@ -279,9 +283,11 @@ public class ViewWebActivity extends Activity implements View.OnClickListener, I
             index_bottom_menu_goback.setVisibility(View.GONE);
             index_bottom_menu_nogoback.setVisibility(View.VISIBLE);
         }
-        Integer oldcount = Integer.valueOf(index_bottom_tab_count.getText().toString());
-        oldcount++;
-        index_bottom_tab_count.setText(oldcount.toString());
+
+        //添加历史
+        String date = new SimpleDateFormat("yyyyMMdd", Locale.CHINA).format(new Date()).toString();
+        FavAndHisManager favAndHisManager = new FavAndHisManager(this);
+        favAndHisManager.addHistory(view.getTitle(), url, Long.parseLong(date));
     }
 
     @Override
@@ -300,5 +306,11 @@ public class ViewWebActivity extends Activity implements View.OnClickListener, I
 
     private void newWindow() {
         webViewManage.newOrSelWindow();
+    }
+
+    public void onNewPage() {
+        Integer oldcount = Integer.valueOf(index_bottom_tab_count.getText().toString());
+        oldcount++;
+        index_bottom_tab_count.setText(oldcount.toString());
     }
 }

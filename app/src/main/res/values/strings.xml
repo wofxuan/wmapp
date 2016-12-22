@@ -19,6 +19,8 @@
     <string name="slide_right_cancel">取消</string>
     <string name="slide_right_go">前往</string>
 
+    <string name="refresh">刷新</string>
+    <string name="favorite">书签</string>
     <string name="menu_about">关于</string>
     <string name="menu_bookmark_add">添加收藏</string>
     <string name="menu_bookmark_open">书签/历史</string>
@@ -36,6 +38,9 @@
 
     <string name="modifyfavorites">修改书签</string>
     <string name="deletefavorites">删除书签</string>
+    <string name="deleteAllHistory">清空历史</string>
+    <string name="deletehistory">删除历史</string>
+
     <string name="favname">名称：</string>
     <string name="url">网址：</string>
     <string name="blank"> </string>
