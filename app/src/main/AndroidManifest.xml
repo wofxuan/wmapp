@@ -53,9 +53,13 @@
             android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name="com.mx.android.wmapp.activity.ViewWebActivity"
+            android:name="com.mx.android.wmapp.viewweb.ViewWebActivity"
             android:label="@string/title_activity_view_web"
-            android:theme="@style/AppTheme.NoActionBar"></activity>
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name="com.mx.android.wmapp.viewweb.FavAndHisActivity"
+            android:theme="@android:style/Theme.NoTitleBar"
+            android:label="@string/app_name"/>
     </application>
 
 </manifest>

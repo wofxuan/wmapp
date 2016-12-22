@@ -16,6 +16,7 @@ import com.mx.android.wmapp.adapter.RecyclerViewItemClick;
 import com.mx.android.wmapp.base.BaseActivity;
 import com.mx.android.wmapp.common.CommFun;
 import com.mx.android.wmapp.entity.OptData;
+import com.mx.android.wmapp.viewweb.ViewWebActivity;
 
 public class MainActivity extends BaseActivity {
     private RecyclerView lstOpt = null;
