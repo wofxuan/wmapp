@@ -5,12 +5,17 @@ import android.app.AlertDialog;
 import android.app.FragmentManager;
 import android.app.FragmentTransaction;
 import android.content.Context;
-import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.View;
 import android.widget.FrameLayout;
+import android.widget.ListView;
+
+import com.android.mx.wmapp.R;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by Administrator on 2016-12-21.
@@ -20,6 +25,9 @@ public class WebViewManage {
     private Context mContext;
     private FragmentManager fm;
     private FrameLayout mFrame;
+    private AlertDialog.Builder mBuilder;
+    private AlertDialog mDialog;
+    private WebListAdspter listAdapter;
     private WebViewFragment currFragment;
 
     public WebViewManage(Context context, FrameLayout fragment) {
@@ -27,11 +35,17 @@ public class WebViewManage {
         mFrame = fragment;
         fm = ((Activity) context).getFragmentManager();
         listFragment = new ArrayList();
+        mBuilder = new AlertDialog.Builder(mContext);
     }
 
-    private void showPage(WebViewFragment fragment){
+    private void showPage(WebViewFragment fragment) {
         FragmentTransaction transaction = fm.beginTransaction();
-        transaction.replace(mFrame.getId(), fragment);
+        if (fragment.isHidden()) {
+            transaction.show(fragment);
+        } else {
+            transaction.replace(mFrame.getId(), fragment);
+        }
+
         currFragment = fragment;
         transaction.commit();
     }
@@ -42,15 +56,52 @@ public class WebViewManage {
         args.putString("openUrl", URL);
         webFragment.setArguments(args);
 
-        ((IWebViewEvent)mContext).onNewPage();
+        ((IWebViewEvent) mContext).onNewPageShow();
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.add(mFrame.getId(), webFragment);
+        transaction.show(webFragment);
+        transaction.commit();
 
-        showPage(webFragment);
+        currFragment = webFragment;
+        listFragment.add(webFragment);
+    }
+
+    public void addHideNewWebView(String URL) {
+        WebViewFragment webFragment = new WebViewFragment();
+        Bundle args = new Bundle();
+        args.putString("openUrl", URL);
+        webFragment.setArguments(args);
+
+        FragmentTransaction transaction = fm.beginTransaction();
+        transaction.add(mFrame.getId(), webFragment);
+        transaction.hide(webFragment);
+        transaction.commit();
+
+        ((IWebViewEvent) mContext).onNewPageShow();
         listFragment.add(webFragment);
     }
 
     public void delWebView(int index) {
         if (listFragment.size() >= index) {
-            listFragment.remove(index);
+            WebViewFragment webFragment = listFragment.get(index);
+            if (webFragment == currFragment) {
+                listFragment.remove(index);
+                if (listFragment.size() > 0) {
+                    showWebView(listFragment.size() - 1);
+                }
+            } else {
+                listFragment.remove(index);
+            }
+
+            mDialog.dismiss();
+        }
+    }
+
+    public void showWebView(int index) {
+        if (listFragment.size() > index) {
+            WebViewFragment webFragment = listFragment.get(index);
+            showPage(webFragment);
+            mDialog.dismiss();
         }
     }
 
@@ -83,20 +134,26 @@ public class WebViewManage {
     }
 
     public void newOrSelWindow() {
-        final String[] items = new String[listFragment.size()];
+        //inflate 你需要的layout
+        View contents = View.inflate(mContext, R.layout.web_diag_listview, null);
+
+        ListView listView = (ListView) contents.findViewById(R.id.web_item_list);
+
+        List<Map<String, Object>> list = new ArrayList<Map<String, Object>>();
         for (int i = 0; i < listFragment.size(); i++) {
             WebViewFragment webFragment = listFragment.get(i);
-            items[i] = webFragment.curURLTitle;
+            Map<String, Object> map = new HashMap<String, Object>();
+            map.put("url", webFragment.curURLTitle);
+            list.add(map);
         }
-        AlertDialog.Builder listDialog = new AlertDialog.Builder(mContext);
-        listDialog.setTitle("Fragment列表");
-        listDialog.setItems(items, new DialogInterface.OnClickListener() {
-            @Override
-            public void onClick(DialogInterface dialog, int which) {
-                WebViewFragment webFragment = listFragment.get(which);
-                showPage(webFragment);
-            }
-        });
-        listDialog.show();
+
+        listAdapter = new WebListAdspter(mContext, list);
+        listView.setAdapter(listAdapter);
+
+        mBuilder.setTitle("打开列表")
+                .setCancelable(true)
+                .setView(contents); //关键是这里，将alertdialog和layout联系在一起
+
+        mDialog = mBuilder.show();
     }
 }

@@ -31,6 +31,8 @@ import java.util.Date;
 import java.util.Locale;
 
 public class ViewWebActivity extends Activity implements View.OnClickListener, IWebViewEvent {
+    //主页地址
+    private String home_url = "http://www.baidu.com";
 
     RelativeLayout main_layout;
     LinearLayout index_view;
@@ -58,8 +60,7 @@ public class ViewWebActivity extends Activity implements View.OnClickListener, I
     ImageView search_title_url_clear;
     Button search_title_go;
     TextView index_bottom_tab_count;
-    //    WebViewClient homeWebViewClient;
-//    WebChromeClient homeWebChromeClient;
+
     TextWatcher search_title_edit_changed = new TextWatcher() {
         @Override
         public void beforeTextChanged(CharSequence s, int start, int count, int after) {
@@ -87,8 +88,6 @@ public class ViewWebActivity extends Activity implements View.OnClickListener, I
             //是否显示取消
         }
     };
-    //主页地址
-    private String home_url = "http://www.baidu.com";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -308,9 +307,32 @@ public class ViewWebActivity extends Activity implements View.OnClickListener, I
         webViewManage.newOrSelWindow();
     }
 
-    public void onNewPage() {
+    @Override
+    public void onNewPageShow() {
         Integer oldcount = Integer.valueOf(index_bottom_tab_count.getText().toString());
         oldcount++;
         index_bottom_tab_count.setText(oldcount.toString());
+    }
+
+    @Override
+    public void onAddNewPage(String URL, boolean isHide) {
+        if (isHide) {
+            webViewManage.addHideNewWebView(URL);
+        } else {
+            webViewManage.addNewWebView(URL);
+        }
+    }
+
+    @Override
+    public void onDelPage(Integer indexWeb) {
+        webViewManage.delWebView(indexWeb);
+        Integer oldcount = Integer.valueOf(index_bottom_tab_count.getText().toString());
+        oldcount--;
+        index_bottom_tab_count.setText(oldcount.toString());
+    }
+
+    @Override
+    public void onShowPage(Integer indexWeb) {
+        webViewManage.showWebView(indexWeb);
     }
 }
