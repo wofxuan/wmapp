@@ -39,6 +39,26 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
         context = this;
 
         tooolBarCaption = (TextView) findViewById(R.id.toolBarCaption);
+        initActionBar();
+
+        btnbef = (Button) findViewById(R.id.btn_bef);
+        btnbef.setOnClickListener(this);
+
+        btnnext = (Button) findViewById(R.id.btn_next);
+        btnnext.setOnClickListener(this);
+
+        btnpageNo = (Button) findViewById(R.id.btn_pageNo);
+        btnpageNo.setOnClickListener(this);
+
+        zoomImg = (ZoomImageView) findViewById(R.id.image);
+        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(),
+                R.mipmap.viewimg);
+        zoomImg.setImage(bitmap);
+
+        mImgViewManage = new ImgViewManage(this, zoomImg);
+    }
+
+    private void initActionBar() {
         Toolbar toolbar = (Toolbar) findViewById(R.id.imgtoolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
@@ -69,22 +89,6 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
                 return true;
             }
         });
-
-        btnbef = (Button) findViewById(R.id.btn_bef);
-        btnbef.setOnClickListener(this);
-
-        btnnext = (Button) findViewById(R.id.btn_next);
-        btnnext.setOnClickListener(this);
-
-        btnpageNo = (Button) findViewById(R.id.btn_pageNo);
-        btnpageNo.setOnClickListener(this);
-
-        zoomImg = (ZoomImageView) findViewById(R.id.image);
-        Bitmap bitmap = BitmapFactory.decodeResource(this.getResources(),
-                R.mipmap.viewimg);
-        zoomImg.setImage(bitmap);
-
-        mImgViewManage = new ImgViewManage(this, zoomImg);
     }
 
     @Override
@@ -128,10 +132,10 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
         // TODO Auto-generated method stub
         if (v.getId() == btnbef.getId()) {
             mImgViewManage.BeforePic();
-            btnpageNo.setText("页码(" + mImgViewManage.mCurrPos + ")");
+            btnpageNo.setText("(" + mImgViewManage.mCurrPos + ")");
         } else if (v.getId() == btnnext.getId()) {
             mImgViewManage.NextPic();
-            btnpageNo.setText("页码(" + mImgViewManage.mCurrPos + ")");
+            btnpageNo.setText("(" + mImgViewManage.mCurrPos + ")");
         } else if (v.getId() == btnpageNo.getId()) {
             InputNum();
         }
