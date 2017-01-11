@@ -40,7 +40,7 @@
                 android:layout_height="40dip"
                 android:layout_gravity="left"
                 android:layout_weight="1"
-                android:text="输入页码" />
+                android:text="页码" />
             <Button
                 android:id="@+id/btn_next"
                 android:layout_width="40dip"

@@ -32,7 +32,7 @@ import java.util.Locale;
 
 public class ViewWebActivity extends Activity implements View.OnClickListener, IWebViewEvent {
     //主页地址
-    private String home_url = "http://www.baidu.com";
+    private String home_url = "";//"http://www.baidu.com";
 
     RelativeLayout main_layout;
     LinearLayout index_view;

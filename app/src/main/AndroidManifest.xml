@@ -49,7 +49,7 @@
             android:theme="@style/AppTheme.NoActionBar"
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
-            android:name="com.mx.android.wmapp.activity.ImgViewActivity"
+            android:name="com.mx.android.wmapp.ImgView.ImgViewActivity"
             android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
