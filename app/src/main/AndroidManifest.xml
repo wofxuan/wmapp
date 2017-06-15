@@ -13,6 +13,11 @@
     <uses-permission android:name="android.permission.READ_LOGS" />
     <uses-permission android:name="android.permission.WAKE_LOCK" />
     <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <uses-permission android:name="android.permission.VIBRATE"/>
+    <uses-permission android:name="android.permission.DISABLE_KEYGUARD"/>
+    <uses-permission android:name="android.permission.MODIFY_AUDIO_SETTINGS" />
+
 
     <permission
         android:name="android.permission.FORCE_STOP_PACKAGES"
@@ -49,7 +54,7 @@
             android:windowSoftInputMode="stateAlwaysHidden" />
         <activity
             android:name="com.mx.android.wmapp.ImgView.ImgViewActivity"
-            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation"/>
+            android:configChanges="orientation|screenSize|smallestScreenSize|keyboard|keyboardHidden|navigation" />
         <activity
             android:name="com.mx.android.wmapp.viewweb.ViewWebActivity"
             android:label="@string/title_activity_view_web"
@@ -58,6 +63,20 @@
             android:name="com.mx.android.wmapp.viewweb.FavAndHisActivity"
             android:label="@string/app_name"
             android:theme="@android:style/Theme.NoTitleBar" />
+        <activity
+            android:name="com.mx.android.wmapp.activity.AlarmClockActivity"
+            android:label="@string/alarm_title" />
+        <service android:name="com.mx.android.wmapp.alarmclock.AlarmService" />
+        <receiver android:name="com.mx.android.wmapp.alarmclock.AlarmService$RebootReceiver">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED" />
+            </intent-filter>
+        </receiver>
+        <receiver android:name="com.mx.android.wmapp.alarmclock.MyAlarmReceiver"/>
+        <receiver android:name="com.mx.android.wmapp.alarmclock.SnoozeReceiver"/>
+        <activity android:name="com.mx.android.wmapp.alarmclock.AddAlarmActivity" />
+        <activity android:name="com.mx.android.wmapp.alarmclock.PlayAlarmActivity" />
+        <activity android:name="com.mx.android.wmapp.alarmclock.EditAlarmActivity"></activity>
     </application>
 
 </manifest>

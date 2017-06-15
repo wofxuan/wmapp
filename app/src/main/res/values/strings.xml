@@ -14,6 +14,8 @@
     <string name="file_clear_history">清空记录</string>
     <string name="file_openzip">打开压缩文件</string>
     <string name="file_opendir">打开目录</string>
+
+    <!-- 网页浏览 开始-->
     <string name="title_activity_view_web">ViewWebActivity</string>
     <string name="slide_right_go_search">搜索</string>
     <string name="slide_right_cancel">取消</string>
@@ -44,7 +46,27 @@
     <string name="favname">名称：</string>
     <string name="url">网址：</string>
     <string name="blank"> </string>
+    <!-- 网页浏览 结束-->
 
+    <!-- 闹钟 开始-->
+    <string name="alarm_title">闹钟</string>
+    <string name="no_alarm">点击 + 添加闹钟</string>
+    <string name="title_activity_about">关于</string>
+    <string name="title_activity_finish">退出</string>
+    <string name="add_alarm">闹钟名</string>
+    <string name="details">设置闹钟</string>
+    <string name="time">时间</string>
+    <string name="repeat">响铃周期</string>
+    <string name="wake_method">停闹方式</string>
+    <string name="ring_type">响铃方式</string>
+    <string name="title_activity_add_alarm">添加闹钟</string>
+    <string name="action_discard_alarm">Discard Alarm</string>
+    <string name="action_save_alarm">Save Alarm</string>
+    <string name="alarm_complete">闹钟时间到</string>
+    <string name="answer_hint">答案输在这儿...</string>
+    <string name="input_complete">输入好了</string>
+    <string name="title_activity_edit_alarm">编辑闹钟</string>
+    <!-- 闹钟 结束-->
     <!-- TODO: Remove or change this placeholder text -->
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

@@ -82,6 +82,8 @@ public class MainActivity extends BaseActivity {
                 startActivity(new Intent(MainActivity.this, ImgViewActivity.class));
             }else if (sid == OptData.view_web){
                 startActivity(new Intent(MainActivity.this, ViewWebActivity.class));
+            }else if (sid == OptData.alarm_clock){
+                startActivity(new Intent(MainActivity.this, AlarmClockActivity.class));
             }
         }
 

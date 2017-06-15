@@ -103,8 +103,7 @@ public class SysStateActivity extends BaseActivity {
             for (String num : arrayOfString) {
                 Log.i(str2, num + "\t");
             }
-
-            initial_memory = Integer.valueOf(arrayOfString[1]).intValue() * 1024;// 获得系统总内存，单位是KB，乘以1024转换为Byte
+            initial_memory = Long.valueOf(arrayOfString[1]).longValue() * 1024;// 获得系统总内存，单位是KB，乘以1024转换为Byte
             localBufferedReader.close();
 
         } catch (IOException e) {

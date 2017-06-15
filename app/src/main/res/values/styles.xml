@@ -22,4 +22,8 @@
         <item name="android:popupBackground">@android:color/white</item>
         <item name="android:dropDownVerticalOffset">10.0dip</item>
     </style>
+
+    <style name="Theme.PopupMenu" parent="@android:style/Widget.PopupMenu">
+        <item name="android:popupBackground">@color/primary</item>
+    </style>
 </resources>

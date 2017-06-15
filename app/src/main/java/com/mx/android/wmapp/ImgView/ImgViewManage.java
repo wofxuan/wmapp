@@ -59,7 +59,7 @@ public class ImgViewManage {
     }
 
     public void BeforePic() {
-        if (mViewType == 0) {
+        if (mViewType.intValue() == 0) {
             if (mCurrPos.intValue() > 0) {
                 mCurrPos = mCurrPos - 1;
                 SetBitmapFormZipEntry(mCurrPos);
@@ -73,23 +73,26 @@ public class ImgViewManage {
     }
 
     public void GotoNumPic(Integer num) {
-        if (num.intValue() < mAllImgList.size()) {
-            SetBitmapFormZipEntry(num);
-        } else {
-            while (num.intValue() != mAllImgList.size()) {
-                ZipEntry ze = GetNextZE();
-                if (ze == null) {
-                    break;
+        if (mViewType.intValue() == 0) {
+            if (num.intValue() < mAllImgList.size()) {
+                SetBitmapFormZipEntry(num);
+            } else {
+                while (num.intValue() != mAllImgList.size()) {
+                    ZipEntry ze = GetNextZE();
+                    if (ze == null) {
+                        break;
+                    }
+                    mAllImgList.add(ze);
                 }
-                mAllImgList.add(ze);
+                SetBitmapFormZipEntry(mAllImgList.size() - 1);
             }
-            SetBitmapFormZipEntry(mAllImgList.size() - 1);
         }
     }
 
     public void IniImgList(String filePath, Integer viewType) {
         mCurrPath = filePath;
         mViewType = viewType;
+        mCurrPos = 0;
         if (mViewType.intValue() == 0) {
             try {
                 readZipFile(filePath);
