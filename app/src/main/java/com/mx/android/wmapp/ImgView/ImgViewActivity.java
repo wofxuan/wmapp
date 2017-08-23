@@ -72,7 +72,7 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
                         intent = new Intent(context, DFSelectActivity.class);
                         intent.putExtra("type", DFSelectActivity.TypeOpen);
                         intent.putExtra("result_code", OPEN_FILE_REQUEST_CODE);
-                        intent.putExtra("defaultDir", DFSelectActivity.getOpenDirHis());
+                        intent.putExtra("defaultDir", DFSelectActivity.getOpenDirHis(ImgViewActivity.this));
                         intent.putExtra("fileType", new String[]{"*.*"});
                         startActivityForResult(intent, OPEN_FILE_REQUEST_CODE);
                         break;
@@ -80,7 +80,7 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
                         intent = new Intent(context, DFSelectActivity.class);
                         intent.putExtra("type", DFSelectActivity.TypeOpen);
                         intent.putExtra("result_code", OPEN_DIR_REQUEST_CODE);
-                        intent.putExtra("defaultDir", DFSelectActivity.getOpenDirHis());
+                        intent.putExtra("defaultDir", DFSelectActivity.getOpenDirHis(ImgViewActivity.this));
                         startActivityForResult(intent, OPEN_DIR_REQUEST_CODE);
                         break;
                     default:
@@ -112,6 +112,7 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
+        if (data == null) return;
         String aCurrPath = data.getStringExtra("selectPath");
         if (requestCode == OPEN_FILE_REQUEST_CODE) {
             if (resultCode == OPEN_FILE_REQUEST_CODE) {

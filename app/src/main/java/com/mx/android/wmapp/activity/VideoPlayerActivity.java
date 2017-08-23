@@ -106,7 +106,7 @@ public class VideoPlayerActivity extends BaseActivity {
                         Intent intent = new Intent(context, DFSelectActivity.class);
                         intent.putExtra("type", DFSelectActivity.TypeOpen);
                         intent.putExtra("result_code", OPEN_FILE_REQUEST_CODE);
-                        intent.putExtra("defaultDir", DFSelectActivity.getOpenDirHis());
+                        intent.putExtra("defaultDir", DFSelectActivity.getOpenDirHis(VideoPlayerActivity.this));
                         intent.putExtra("fileType", new String[]{"*.*"});
                         startActivityForResult(intent, OPEN_FILE_REQUEST_CODE);
                         break;
