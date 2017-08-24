@@ -17,24 +17,46 @@ import com.mx.android.wmapp.adapter.OptAdapter;
 import com.mx.android.wmapp.adapter.RecyclerViewItemClick;
 import com.mx.android.wmapp.base.BaseActivity;
 import com.mx.android.wmapp.common.CommFun;
+import com.mx.android.wmapp.entity.EventCenter;
 import com.mx.android.wmapp.entity.OptData;
 import com.mx.android.wmapp.viewweb.ViewWebActivity;
 
+import butterknife.BindView;
+
 public class MainActivity extends BaseActivity {
-    private RecyclerView lstOpt = null;
+    @BindView(R.id.lstOpt)
+    public RecyclerView lstOpt;
+
     private OptAdapter lstItem = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_main);
         initActionBar();
-        lstOpt = (RecyclerView) findViewById(R.id.lstOpt);
-//        lstOpt.setLayoutManager(new LinearLayoutManager(this));
+
         lstOpt.setLayoutManager(new GridLayoutManager(this, 3));
         lstItem = new OptAdapter(this);
         lstOpt.setAdapter(lstItem);
         lstItem.setOnRecyclerViewItemClickListener(new OnItemClickListenerImpl()); // 单击选项
+    }
+
+    @Override
+    protected boolean isApplyButterKnife() {
+        return true;
+    }
+
+    @Override
+    protected boolean isApplyEventBus() {
+        return true;
+    }
+
+    @Override
+    protected void onEventComing(EventCenter eventCenter) {
+    }
+
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_main;
     }
 
     private void initActionBar() {
@@ -42,6 +64,7 @@ public class MainActivity extends BaseActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
     }
+
     @Override //重写onCreateOptionMenu(Menu menu)方法，当菜单第一次被加载时调用
     public boolean onCreateOptionsMenu(Menu menu) {
         //填充选项菜单（读取XML文件、解析、加载到Menu组件上）
@@ -76,13 +99,13 @@ public class MainActivity extends BaseActivity {
                 startActivity(new Intent(MainActivity.this, SysStateActivity.class));
             } else if (sid == OptData.cur_Pos) {
                 startActivity(new Intent(MainActivity.this, GetLocationActivity.class));
-            } else if (sid == OptData.video_player){
+            } else if (sid == OptData.video_player) {
                 startActivity(new Intent(MainActivity.this, VideoPlayerActivity.class));
-            } else if (sid == OptData.view_img){
+            } else if (sid == OptData.view_img) {
                 startActivity(new Intent(MainActivity.this, ImgViewActivity.class));
-            }else if (sid == OptData.view_web){
+            } else if (sid == OptData.view_web) {
                 startActivity(new Intent(MainActivity.this, ViewWebActivity.class));
-            }else if (sid == OptData.alarm_clock){
+            } else if (sid == OptData.alarm_clock) {
                 startActivity(new Intent(MainActivity.this, AlarmClockActivity.class));
             }
         }

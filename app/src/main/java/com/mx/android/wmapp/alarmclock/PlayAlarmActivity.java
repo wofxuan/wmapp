@@ -14,6 +14,7 @@ import com.mx.android.wmapp.alarmclock.fragment.NormalFragment;
 import com.mx.android.wmapp.alarmclock.fragment.QuestionFragment;
 import com.mx.android.wmapp.alarmclock.model.AlarmModel;
 import com.mx.android.wmapp.base.BaseActivity;
+import com.mx.android.wmapp.entity.EventCenter;
 import com.mx.android.wmapp.utils.ActivityManager;
 
 public class PlayAlarmActivity extends BaseActivity {
@@ -31,7 +32,6 @@ public class PlayAlarmActivity extends BaseActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_play_alarm);
         ActivityManager.addActivity(this);
 
         audioManager = (AudioManager) getSystemService(Context.AUDIO_SERVICE);
@@ -74,6 +74,25 @@ public class PlayAlarmActivity extends BaseActivity {
             startVibrate();
         }
 
+    }
+
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_play_alarm;
+    }
+
+    @Override
+    protected boolean isApplyButterKnife() {
+        return true;
+    }
+
+    @Override
+    protected boolean isApplyEventBus() {
+        return true;
+    }
+
+    @Override
+    protected void onEventComing(EventCenter eventCenter) {
     }
 
     private void startRing(int ringCode) {

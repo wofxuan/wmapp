@@ -26,6 +26,7 @@ import com.mx.android.wmapp.activity.AlarmClockActivity;
 import com.mx.android.wmapp.alarmclock.data.MyAlarmDataBase;
 import com.mx.android.wmapp.alarmclock.model.AlarmModel;
 import com.mx.android.wmapp.base.BaseActivity;
+import com.mx.android.wmapp.entity.EventCenter;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -65,7 +66,7 @@ public class AddAlarmActivity extends BaseActivity implements TimePickerDialog.O
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_alarm);
+//        setContentView(R.layout.activity_add_alarm);
 
         //初始化View
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
@@ -159,6 +160,24 @@ public class AddAlarmActivity extends BaseActivity implements TimePickerDialog.O
 
     }
 
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_add_alarm;
+    }
+
+    @Override
+    protected boolean isApplyButterKnife() {
+        return true;
+    }
+
+    @Override
+    protected boolean isApplyEventBus() {
+        return true;
+    }
+
+    @Override
+    protected void onEventComing(EventCenter eventCenter) {
+    }
     //保存当前设置状态
     @Override
     protected void onSaveInstanceState(Bundle outState) {

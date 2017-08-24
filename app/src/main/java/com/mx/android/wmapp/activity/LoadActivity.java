@@ -8,6 +8,7 @@ import android.view.WindowManager;
 
 import com.android.mx.wmapp.R;
 import com.mx.android.wmapp.base.BaseActivity;
+import com.mx.android.wmapp.entity.EventCenter;
 
 public class LoadActivity extends BaseActivity {
 
@@ -18,7 +19,6 @@ public class LoadActivity extends BaseActivity {
         super.onCreate(savedInstanceState);
         getWindow().setFormat(PixelFormat.RGBA_8888);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_DITHER);
-        setContentView(R.layout.activity_load);
         new Handler().postDelayed(new Runnable() {
             public void run() {
                                  /* Create an Intent that will start the Main WordPress Activity. */
@@ -27,5 +27,24 @@ public class LoadActivity extends BaseActivity {
                 LoadActivity.this.finish();
             }
         }, LOAD_DISPLAY_TIME); //1500 for release
+    }
+
+    @Override
+    protected boolean isApplyButterKnife() {
+        return true;
+    }
+
+    @Override
+    protected boolean isApplyEventBus() {
+        return true;
+    }
+
+    @Override
+    protected void onEventComing(EventCenter eventCenter) {
+    }
+
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_load;
     }
 }

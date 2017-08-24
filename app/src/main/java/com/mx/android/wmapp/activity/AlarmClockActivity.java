@@ -29,6 +29,7 @@ import com.mx.android.wmapp.alarmclock.EditAlarmActivity;
 import com.mx.android.wmapp.alarmclock.data.MyAlarmDataBase;
 import com.mx.android.wmapp.alarmclock.model.AlarmModel;
 import com.mx.android.wmapp.base.BaseActivity;
+import com.mx.android.wmapp.entity.EventCenter;
 import com.mx.android.wmapp.utils.ActivityManager;
 import com.mx.android.wmapp.utils.DividerItemDecoration;
 import com.mx.android.wmapp.utils.MyTimeSorter;
@@ -42,31 +43,37 @@ import java.util.Comparator;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import butterknife.BindView;
+import butterknife.OnClick;
+
 public class AlarmClockActivity extends BaseActivity {
 
+    @BindView(R.id.toolbar)
+    public Toolbar mToolBar;
+    @BindView(R.id.add_reminder)
+    public FloatingActionButton mAddAlarmBtn;
+    @BindView(R.id.alarm_list)
+    public RecyclerView mRecyclerView;
+    @BindView(R.id.no_alarm_text)
+    public TextView mNoAlarmTextView;
     private MyAlarmDataBase db;
-    private Toolbar mToolBar;
-    private FloatingActionButton mAddAlarmBtn;
-    private RecyclerView mRecyclerView;
-    private TextView mNoAlarmTextView;
     private MyReAdapter adapter;
     private LinkedHashMap<Integer, Integer> IDmap = new LinkedHashMap<>();
     private AlarmService.MyBinder binder;
     private ServiceConnection connection = null;
 
+    @OnClick(R.id.add_reminder)
+    public void onClick(View v) {
+        Intent intent = new Intent(v.getContext(), AddAlarmActivity.class);
+        startActivity(intent);
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_alarm_clock);
         ActivityManager.addActivity(this);
 
         db = new MyAlarmDataBase(getApplicationContext());
-
-        mToolBar = (Toolbar) findViewById(R.id.toolbar);
-        mAddAlarmBtn = (FloatingActionButton) findViewById(R.id.add_reminder);
-        mRecyclerView = (RecyclerView) findViewById(R.id.alarm_list);
-        mNoAlarmTextView = (TextView) findViewById(R.id.no_alarm_text);
 
         List<AlarmModel> mAlarmList = db.getAllAlarms();
 
@@ -80,19 +87,29 @@ public class AlarmClockActivity extends BaseActivity {
         adapter = new MyReAdapter();
         adapter.setItemCount();
         mRecyclerView.setAdapter(adapter);
-        mRecyclerView.addItemDecoration(new DividerItemDecoration(this,DividerItemDecoration.VERTICAL_LIST));
+        mRecyclerView.addItemDecoration(new DividerItemDecoration(this, DividerItemDecoration.VERTICAL_LIST));
 
         setSupportActionBar(mToolBar);
         mToolBar.setTitle(R.string.app_name);
+    }
 
-        mAddAlarmBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(v.getContext(), AddAlarmActivity.class);
-                startActivity(intent);
-            }
-        });
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_alarm_clock;
+    }
 
+    @Override
+    protected boolean isApplyButterKnife() {
+        return true;
+    }
+
+    @Override
+    protected boolean isApplyEventBus() {
+        return true;
+    }
+
+    @Override
+    protected void onEventComing(EventCenter eventCenter) {
     }
 
     protected int getDefaultItemCount() {
@@ -113,37 +130,117 @@ public class AlarmClockActivity extends BaseActivity {
 
     }
 
-    public void cancelAlarm(final Context context, final int id, final AlarmModel alarm){
+    public void cancelAlarm(final Context context, final int id, final AlarmModel alarm) {
 
-        connection = new ServiceConnection(){
+        connection = new ServiceConnection() {
             @Override
             public void onServiceConnected(ComponentName name, IBinder service) {
-                binder = (AlarmService.MyBinder)service;
-                binder.cancelAlarm(alarm,id, context);
+                binder = (AlarmService.MyBinder) service;
+                binder.cancelAlarm(alarm, id, context);
             }
 
             @Override
             public void onServiceDisconnected(ComponentName name) {
-                Log.d("MainActivity","解绑服务");
+                Log.d("MainActivity", "解绑服务");
             }
         };
-        Intent intent = new Intent(this,AlarmService.class);
+        Intent intent = new Intent(this, AlarmService.class);
 
         bindService(intent, connection, BIND_AUTO_CREATE);
 
         Log.d("MainActivity", "取消闹钟");
         new Thread(new Runnable() {
             public void run() {
-                    try {
-                        Thread.sleep(2000);
-                        unbindService(connection);//不能bindService后马上调用，可能onServiceConnected不执行
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+                try {
+                    Thread.sleep(2000);
+                    unbindService(connection);//不能bindService后马上调用，可能onServiceConnected不执行
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }).start();
     }
 
+    private void restartAlarm(final String time, final String repeat, final int id, final String intervalTime) {
+
+        connection = new ServiceConnection() {
+            @Override
+            public void onServiceConnected(ComponentName name, IBinder service) {
+                binder = (AlarmService.MyBinder) service;
+                switch (repeat) {
+                    case "只响一次":
+                        binder.setSingleAlarm(getApplicationContext(), time, id);
+                        break;
+                    case "每天":
+                        binder.setEverydayAlarm(getApplicationContext(), time, id);
+                        break;
+                    case AlarmService.TYPE_HOUR:
+                        binder.setHourAlarm(getApplicationContext(), intervalTime, id);
+                        break;
+                    default:
+                        AlarmModel model = db.getAlarm(id);
+                        String repeatCode = model.getRepeatCode();
+                        binder.setDiyAlarm(getApplicationContext(), repeat, time, id, repeatCode);
+                }
+
+                Log.d("MainActivity", "重启闹钟");
+            }
+
+            @Override
+            public void onServiceDisconnected(ComponentName name) {
+                Log.d("MainActivity", "解绑服务");
+            }
+        };
+        Intent intent = new Intent(this, AlarmService.class);
+        bindService(intent, connection, BIND_AUTO_CREATE);
+
+        new Thread(new Runnable() {
+            public void run() {
+                try {
+                    Thread.sleep(2000);
+                    unbindService(connection);//不能bindService后马上调用，可能onServiceConnected不执行
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
+            }
+        }).start();
+    }
+
+    private void selectAlarm(int id) {
+        String CheckedAlarm = Integer.toString(id);
+        Intent intent = new Intent(this, EditAlarmActivity.class);
+        intent.putExtra(EditAlarmActivity.ALARM_ID, CheckedAlarm);
+        startActivityForResult(intent, 1);
+    }
+
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        adapter.setItemCount();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        getMenuInflater().inflate(R.menu.main_menu, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case R.id.action_finish:
+                finish();
+                break;
+//            case R.id.action_about:
+//                Intent i = new Intent(this,AboutActivity.class);
+//                startActivity(i);
+        }
+        return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        finish();
+        super.onBackPressed();
+    }
 
     class MyReAdapter extends RecyclerView.Adapter<MyReAdapter.MyViewHolder> {
 
@@ -230,6 +327,46 @@ public class AlarmClockActivity extends BaseActivity {
             return mItems.size();
         }
 
+        public List<AlarmItem> loadData() {
+
+            ArrayList<AlarmItem> items = new ArrayList<>();
+            List<AlarmModel> am = db.getAllAlarms();
+            List<String> Titles = new ArrayList<>();
+            List<String> Repeat = new ArrayList<>();
+            List<String> RepeatCode = new ArrayList<>();
+            List<String> Actives = new ArrayList<>();
+            List<String> Time = new ArrayList<>();
+            List<Integer> IDList = new ArrayList<>();
+            List<MyTimeSorter> TimeSortList = new ArrayList<>();
+
+            for (AlarmModel a : am) {
+                Titles.add(a.getTitle());
+                Time.add(a.getTime());
+                Repeat.add(a.getRepeatType());
+                RepeatCode.add(a.getRepeatCode());
+                Actives.add(a.getActive());
+                IDList.add(a.getID());
+            }
+
+            int key = 0;
+            for (int k = 0; k < Titles.size(); k++) {
+                TimeSortList.add(new MyTimeSorter(key, Time.get(k)));
+                key++;
+            }
+
+            Collections.sort(TimeSortList, new TimeComparator());
+
+            int k = 0;
+            for (MyTimeSorter item : TimeSortList) {
+
+                int i = item.getIndex();
+                items.add(new AlarmItem(Titles.get(i), Time.get(i), Repeat.get(i), RepeatCode.get(i), Actives.get(i)));
+                IDmap.put(k, IDList.get(i));
+                k++;
+            }
+            return items;
+        }
+
         class MyViewHolder extends RecyclerView.ViewHolder implements
                 View.OnClickListener {
 
@@ -297,7 +434,6 @@ public class AlarmClockActivity extends BaseActivity {
             }
 
 
-
             public void setAlarmTitle(String title) {
                 mTitleText.setText(title);
                 String letter = "a";
@@ -334,7 +470,6 @@ public class AlarmClockActivity extends BaseActivity {
             }
         }
 
-
         class AlarmItem {
             public String mTitle;
             public String mTime;
@@ -352,46 +487,6 @@ public class AlarmClockActivity extends BaseActivity {
             }
         }
 
-        public List<AlarmItem> loadData() {
-
-            ArrayList<AlarmItem> items = new ArrayList<>();
-            List<AlarmModel> am = db.getAllAlarms();
-            List<String> Titles = new ArrayList<>();
-            List<String> Repeat = new ArrayList<>();
-            List<String> RepeatCode = new ArrayList<>();
-            List<String> Actives = new ArrayList<>();
-            List<String> Time = new ArrayList<>();
-            List<Integer> IDList = new ArrayList<>();
-            List<MyTimeSorter> TimeSortList = new ArrayList<>();
-
-            for (AlarmModel a : am) {
-                Titles.add(a.getTitle());
-                Time.add(a.getTime());
-                Repeat.add(a.getRepeatType());
-                RepeatCode.add(a.getRepeatCode());
-                Actives.add(a.getActive());
-                IDList.add(a.getID());
-            }
-
-            int key = 0;
-            for (int k = 0; k < Titles.size(); k++) {
-                TimeSortList.add(new MyTimeSorter(key, Time.get(k)));
-                key++;
-            }
-
-            Collections.sort(TimeSortList, new TimeComparator());
-
-            int k = 0;
-            for (MyTimeSorter item : TimeSortList) {
-
-                int i = item.getIndex();
-                items.add(new AlarmItem(Titles.get(i), Time.get(i), Repeat.get(i), RepeatCode.get(i), Actives.get(i)));
-                IDmap.put(k, IDList.get(i));
-                k++;
-            }
-            return items;
-        }
-
         public class TimeComparator implements Comparator {
             DateFormat f = new SimpleDateFormat("hh:mm");
 
@@ -407,90 +502,5 @@ public class AlarmClockActivity extends BaseActivity {
             }
         }
 
-    }
-
-    private void restartAlarm( final String time, final String repeat, final int id, final String intervalTime) {
-
-        connection = new ServiceConnection(){
-            @Override
-            public void onServiceConnected(ComponentName name, IBinder service) {
-                binder = (AlarmService.MyBinder)service;
-                switch (repeat){
-                    case "只响一次":
-                        binder.setSingleAlarm(getApplicationContext(),time,id);
-                        break;
-                    case "每天":
-                        binder.setEverydayAlarm(getApplicationContext(),time,id);
-                        break;
-                    case AlarmService.TYPE_HOUR:
-                        binder.setHourAlarm(getApplicationContext(), intervalTime, id);
-                        break;
-                    default:
-                        AlarmModel model = db.getAlarm(id);
-                        String repeatCode = model.getRepeatCode();
-                        binder.setDiyAlarm(getApplicationContext(),repeat,time,id, repeatCode);
-                }
-
-                Log.d("MainActivity","重启闹钟");
-            }
-            @Override
-            public void onServiceDisconnected(ComponentName name) {
-                Log.d("MainActivity","解绑服务");
-            }
-        };
-        Intent intent = new Intent(this,AlarmService.class);
-        bindService(intent,connection,BIND_AUTO_CREATE);
-
-        new Thread(new Runnable() {
-            public void run() {
-                try {
-                    Thread.sleep(2000);
-                    unbindService(connection);//不能bindService后马上调用，可能onServiceConnected不执行
-                } catch (InterruptedException e) {
-                    e.printStackTrace();
-                }
-            }
-        }).start();
-    }
-
-    private void selectAlarm(int id) {
-        String CheckedAlarm = Integer.toString(id);
-        Intent intent = new Intent(this, EditAlarmActivity.class);
-        intent.putExtra(EditAlarmActivity.ALARM_ID, CheckedAlarm);
-        startActivityForResult(intent, 1);
-    }
-
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        adapter.setItemCount();
-    }
-
-    @Override
-    public boolean onCreateOptionsMenu(Menu menu) {
-        getMenuInflater().inflate(R.menu.main_menu,menu);
-        return true;
-    }
-
-    @Override
-    public boolean onOptionsItemSelected(MenuItem item) {
-        switch (item.getItemId()){
-            case R.id.action_finish:
-                finish();
-                break;
-//            case R.id.action_about:
-//                Intent i = new Intent(this,AboutActivity.class);
-//                startActivity(i);
-        }
-        return super.onOptionsItemSelected(item);
-    }
-
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-    }
-
-    @Override
-    public void onBackPressed() {
-        finish();
-        super.onBackPressed();
     }
 }

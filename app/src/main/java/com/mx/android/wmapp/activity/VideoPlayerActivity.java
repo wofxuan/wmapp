@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.android.mx.mxlib.DFSelectActivity;
 import com.android.mx.wmapp.R;
 import com.mx.android.wmapp.base.BaseActivity;
+import com.mx.android.wmapp.entity.EventCenter;
 import com.mx.android.wmapp.utils.DensityUtil;
 
 import java.util.List;
@@ -86,11 +87,9 @@ public class VideoPlayerActivity extends BaseActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+        Vitamio.isInitialized(this);//初始化Vitamio库，在布局文件加载之前.tamio.initialize(this)?
         super.onCreate(savedInstanceState);
         context = this;
-        Vitamio.isInitialized(this);//初始化Vitamio库，在布局文件加载之前.tamio.initialize(this)?
-        setContentView(R.layout.activity_video_player);
-
         toolbar = (Toolbar) findViewById(R.id.videplayerotoolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setTitle("");
@@ -157,7 +156,8 @@ public class VideoPlayerActivity extends BaseActivity {
         mVideoView.setMediaController(mediaController);
 
         mVideoView.setVideoQuality(MediaPlayer.VIDEOQUALITY_MEDIUM);
-        mVideoView.setVideoChroma(MediaPlayer.VIDEOCHROMA_RGB565);;
+        mVideoView.setVideoChroma(MediaPlayer.VIDEOCHROMA_RGB565);
+        ;
 //        mVideoView.requestFocus();
         dm = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(dm);
@@ -168,6 +168,26 @@ public class VideoPlayerActivity extends BaseActivity {
         mGestureDetector = new GestureDetector(this, new MyGestectoroListener());
 
         mVideoView.setVideoPath("");
+    }
+
+
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_video_player;
+    }
+
+    @Override
+    protected boolean isApplyButterKnife() {
+        return true;
+    }
+
+    @Override
+    protected boolean isApplyEventBus() {
+        return true;
+    }
+
+    @Override
+    protected void onEventComing(EventCenter eventCenter) {
     }
 
     @Override
@@ -249,9 +269,9 @@ public class VideoPlayerActivity extends BaseActivity {
         // 隐藏
         handler.removeMessages(0);
         handler.sendEmptyMessageDelayed(0, 500);
-        if(toolbar.getVisibility() == View.GONE){
+        if (toolbar.getVisibility() == View.GONE) {
             toolbar.setVisibility(View.VISIBLE);
-        }else {
+        } else {
             toolbar.setVisibility(View.GONE);
         }
     }

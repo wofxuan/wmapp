@@ -25,6 +25,7 @@ import com.getbase.floatingactionbutton.FloatingActionButton;
 import com.mx.android.wmapp.alarmclock.data.MyAlarmDataBase;
 import com.mx.android.wmapp.alarmclock.model.AlarmModel;
 import com.mx.android.wmapp.base.BaseActivity;
+import com.mx.android.wmapp.entity.EventCenter;
 import com.wdullaer.materialdatetimepicker.time.RadialPickerLayout;
 import com.wdullaer.materialdatetimepicker.time.TimePickerDialog;
 
@@ -69,8 +70,6 @@ public class EditAlarmActivity extends BaseActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_add_alarm);
-
         mToolbar = (Toolbar) findViewById(R.id.toolbar);
         mTitleText = (EditText) findViewById(R.id.alarm_title);
         mTimeText = (TextView) findViewById(R.id.set_time);
@@ -158,6 +157,25 @@ public class EditAlarmActivity extends BaseActivity implements
             mFAB1.setVisibility(View.GONE);
             mFAB2.setVisibility(View.VISIBLE);
         }
+    }
+
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_add_alarm;
+    }
+
+    @Override
+    protected boolean isApplyButterKnife() {
+        return true;
+    }
+
+    @Override
+    protected boolean isApplyEventBus() {
+        return true;
+    }
+
+    @Override
+    protected void onEventComing(EventCenter eventCenter) {
     }
 
     protected void onSaveInstanceState (Bundle outState) {

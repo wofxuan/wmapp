@@ -9,6 +9,7 @@ import android.widget.ListView;
 
 import com.android.mx.wmapp.R;
 import com.mx.android.wmapp.base.BaseActivity;
+import com.mx.android.wmapp.entity.EventCenter;
 
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -16,23 +17,22 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import butterknife.BindView;
+
 public class SysStateActivity extends BaseActivity {
-    private ActivityManager mActivityManager = null;
-
-    private ListView mAllListView = null;
-
     List<String> aServiceData = null;
     List<String> aRunningTasksData = null;
     List<String> aOtherData = null;
     List<String> aAllData = null;
-
     String aPackageName = "";
+    private ActivityManager mActivityManager = null;
+
+    @BindView(R.id.All_list)
+    public ListView mAllListView = null;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_sys_state);
-        mAllListView = (ListView) findViewById(R.id.All_list);
 
         mActivityManager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
         ActivityManager.MemoryInfo info = new ActivityManager.MemoryInfo();
@@ -51,17 +51,17 @@ public class SysStateActivity extends BaseActivity {
         aAllData = new ArrayList<String>();
         List<ActivityManager.RunningServiceInfo> mServiceList = mActivityManager
                 .getRunningServices(30);
-        List<ActivityManager.RunningTaskInfo> runningTasks = mActivityManager
-                .getRunningTasks(30);
+//        List<ActivityManager.RunningTaskInfo> runningTasks = mActivityManager
+//                .getRunningTasks(30);
 
         aOtherData.add("系统总内存：" + totalMemSize);
         aOtherData.add("系统剩余内存：" + leftMemSize);
         getServiceClassName(mServiceList, aServiceData);
-        getTaskClassName(runningTasks, aRunningTasksData);
+//        getTaskClassName(runningTasks, aRunningTasksData);
 
         aAllData.addAll(aOtherData);
-        aAllData.add("获取所有获取到运行中的task（任务）:");
-        aAllData.addAll(aRunningTasksData);
+//        aAllData.add("获取所有获取到运行中的task（任务）:");
+//        aAllData.addAll(aRunningTasksData);
         aAllData.add("获取所有启动的服务的类名  :");
         aAllData.addAll(aServiceData);
         mAllListView.setAdapter(new ArrayAdapter<String>(this,
@@ -73,6 +73,26 @@ public class SysStateActivity extends BaseActivity {
         // mRunningTasksListView.setAdapter(new ArrayAdapter<String>(this,
         // R.layout.servicelistview,
         // aRunningTasksData));
+    }
+
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_alarm_clock;
+    }
+
+
+    @Override
+    protected boolean isApplyButterKnife() {
+        return true;
+    }
+
+    @Override
+    protected boolean isApplyEventBus() {
+        return true;
+    }
+
+    @Override
+    protected void onEventComing(EventCenter eventCenter) {
     }
 
     // 获取所有获取到运行中的task（任务）

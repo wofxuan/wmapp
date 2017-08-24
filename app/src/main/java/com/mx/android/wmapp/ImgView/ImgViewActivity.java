@@ -20,6 +20,7 @@ import com.android.mx.mxlib.DFSelectActivity;
 import com.android.mx.wmapp.R;
 import com.mx.android.wmapp.base.BaseActivity;
 import com.mx.android.wmapp.customview.ZoomImageView;
+import com.mx.android.wmapp.entity.EventCenter;
 
 public class ImgViewActivity extends BaseActivity implements View.OnClickListener {
     private static final int OPEN_FILE_REQUEST_CODE = 1;
@@ -35,7 +36,6 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_img_view);
         context = this;
 
         tooolBarCaption = (TextView) findViewById(R.id.toolBarCaption);
@@ -56,6 +56,25 @@ public class ImgViewActivity extends BaseActivity implements View.OnClickListene
         zoomImg.setImage(bitmap);
 
         mImgViewManage = new ImgViewManage(this, zoomImg);
+    }
+
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_img_view;
+    }
+
+    @Override
+    protected boolean isApplyButterKnife() {
+        return true;
+    }
+
+    @Override
+    protected boolean isApplyEventBus() {
+        return true;
+    }
+
+    @Override
+    protected void onEventComing(EventCenter eventCenter) {
     }
 
     private void initActionBar() {
